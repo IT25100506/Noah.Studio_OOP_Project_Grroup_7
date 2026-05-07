@@ -1,0 +1,41 @@
+# =====================
+# IntelliJ IDEA
+# =====================
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# =====================
+# Compiled Output
+# =====================
+out/
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# =====================
+# SmartTomcat Plugin
+# =====================
+.smarttomcat/
+
+# =====================
+# OS Files
+# =====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =====================
+# Logs
+# =====================
+*.log
+logs/
+
+# =====================
+# Uploaded Files (runtime)
+# =====================
+src/main/webapp/uploads/*
+!src/main/webapp/uploads/.gitkeep
