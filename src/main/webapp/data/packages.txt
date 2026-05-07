@@ -1,0 +1,8 @@
+PKG001|Essential Portrait|45000.0|2 Hours|10 High-res Edits, Online Gallery, 1 Location|Perfect for individual or couple portrait sessions in a single location.|true|photography
+PKG002|Cinematic Wedding|150000.0|10 Hours|Full Day Coverage, Highlight Reel, RAW Footage, 4K Quality|Comprehensive wedding cinematography capturing every precious moment of your special day.|true|videography
+PKG003|Studio Masterclass|85000.0|4 Hours|Studio Lighting, Multiple Backdrops, 25 Edits, Print-ready Files|Professional studio photography for brands, families, or editorial portfolios.|true|photography
+PKG004|Event Highlight|65000.0|5 Hours|50 High-res Edits, Online Gallery, 1 Photographer|Perfect for birthdays, anniversaries, or small intimate gatherings.|true|photography
+PKG005|Corporate Vision|120000.0|6 Hours|3min Highlight, Raw Footage, 4K Quality, Drone Shots|Professional cinematic coverage for corporate events and branding.|true|videography
+PKG006|Pre-Wedding Story|95000.0|4 Hours|Location Shoot, 30 Retouched Photos, 1min Teaser Video|Capture the romance before your big day with a themed outdoor session.|true|photography
+PKG007|Documentary Short|180000.0|12 Hours|Full Storytelling, Interviews, 4K Delivery, Extended Cut|A deep dive into your event or brand story with a professional documentary feel.|true|videography
+PKG008|Fashion Editorial|110000.0|5 Hours|Conceptual Set, High-end Retouching, 15 Edits, PDF Lookbook|Avant-garde photography for models, designers, and high-fashion enthusiasts.|true|photography

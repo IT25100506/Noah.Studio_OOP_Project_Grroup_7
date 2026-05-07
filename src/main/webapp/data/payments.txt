@@ -1,0 +1,2 @@
+PAY001|Full|BKG001|USR005|Dineth Jayasinghe|45000.0|Online Payment|Paid|2026-05-07|TID00001|0.0|-
+PAY002|Partial|BKG005|USR005|Dineth Jayasinghe|45000.0|Bank Transfer|Pending|2026-05-07|TR0002|40000.0|-

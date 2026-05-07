@@ -1,0 +1,4 @@
+USR002|ruwindi|ruwindi123|ruvindisenevirathna98@gmail.com|+94 77378 9430|admin|Ruwindi Senavirathne||Available
+USR003|imasha|imasha123|imashasenavirathne17@gmail.com|+94 77853 2300|videographer|Imasha Senavirathne||Available
+USR004|dulansa|dulansa123|dulansaallegedare54@gmail.com|+94 77853 2366|photographer|Dulansa Ellegedare||Available
+USR005|dineth|dineth123|dinethjayasinghe@gmail.com|+94 77378 9999|client|Dineth Jayasinghe||Available

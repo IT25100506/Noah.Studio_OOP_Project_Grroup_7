@@ -1,0 +1,3 @@
+BKG001|USR005|Dineth Jayasinghe|PKG001|Essential Portrait|2026-06-15|10:00|Colombo Studio|Photography|+94 77378 9999|Confirmed|Client wants natural lighting.|2026-05-07|USR003
+BKG004|USR005|Dineth Jayasinghe|PKG004|Event Highlight|2026-05-24|08:30|Okray Hotel Kandy|Event Coverage|+94 77333 9430|Pending||2026-05-07|USR004
+BKG005|USR005|Dineth Jayasinghe|PKG003|Studio Masterclass|2026-05-21|10:00|At Noha. Studio|Portrait|+94 77378 1100|Confirmed||2026-05-07|USR004
