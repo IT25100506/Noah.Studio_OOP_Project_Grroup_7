@@ -53,15 +53,10 @@
 
     <!-- Main Content Area -->
     <main class="main-content">
-        <header class="content-header">
-            <div class="header-title">
-                <span class="section-tag">System Registry</span>
-                <h1>User <span class="text-accent">Management</span></h1>
-            </div>
-            <div class="header-meta">
-                <span class="status-indicator online"></span>
-                Administrator Access • <%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(new java.util.Date()) %>
-            </div>
+        <header class="content-header" style="margin-bottom: 3rem;">
+            <span class="section-tag">System Registry</span>
+            <h1 style="font-size: 2.5rem; margin: 0;">User <span class="serif" style="color:var(--accent); text-transform:none;">Management</span></h1>
+            <p style="color:var(--text-muted); margin-top: 0.5rem;"><span class="status-indicator online"></span> Administrator Access • <%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(new java.util.Date()) %></p>
         </header>
 
         <!-- Modal: Add New User -->
@@ -158,6 +153,13 @@
                                     <option value="On Leave" <%= "On Leave".equals(targetUser.getAvailability()) ? "selected" : "" %>>On Leave</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label>Account Status</label>
+                                <select name="accountStatus" class="form-control">
+                                    <option value="Active" <%= "Active".equals(targetUser.getAccountStatus()) ? "selected" : "" %>>Active</option>
+                                    <option value="Suspended" <%= "Suspended".equals(targetUser.getAccountStatus()) ? "selected" : "" %>>Suspended</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-actions mt-2">
                             <button type="submit" class="btn-primary">Save Changes</button>
@@ -173,13 +175,16 @@
         <div class="registry-controls mb-2">
             <div class="control-header">
                 <h2>Member Registry</h2>
-                <a href="users-management.jsp?showAdd=true" class="btn-primary-sm"><i class="fa fa-plus"></i> Register User</a>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button onclick="exportTableToCSV('Staff_Information.csv')" class="btn-primary-sm" style="background-color: #107c41; color: white; border-color: #107c41;">Export to CSV</button>
+                    <a href="users-management.jsp?showAdd=true" class="btn-primary-sm"><i class="fa fa-plus"></i> Register User</a>
+                </div>
             </div>
             
             <form action="users-management.jsp" method="get" class="search-bar">
                 <div class="input-group">
                     <i class="fa fa-search"></i>
-                    <input type="text" name="q" placeholder="Search by name, ID or email..." value="<%= (query != null) ? query : "" %>">
+                    <input type="text" name="q" placeholder="Search by name, username, ID or email..." value="<%= (query != null) ? query : "" %>">
                 </div>
                 <select name="roleFilter" class="filter-select">
                     <option value="">All Roles</option>
@@ -202,6 +207,7 @@
                         <th>Role</th>
                         <th>Status</th>
                         <th>Email</th>
+                        <th>Last Seen</th>
                         <th class="text-right">Actions</th>
                     </tr>
                 </thead>
@@ -211,6 +217,7 @@
                         for(User u : usersList) { 
                             boolean matchesQ = searchQ.isEmpty() || 
                                                (u.getFullName() != null && u.getFullName().toLowerCase().contains(searchQ)) || 
+                                               (u.getUsername() != null && u.getUsername().toLowerCase().contains(searchQ)) ||
                                                (u.getId() != null && u.getId().toLowerCase().contains(searchQ)) ||
                                                (u.getEmail() != null && u.getEmail().toLowerCase().contains(searchQ));
                             boolean matchesR = filterR.isEmpty() || 
@@ -224,20 +231,24 @@
                         <td class="font-bold"><%= u.getFullName() %></td>
                         <td><span class="role-badge badge-<%= u.getRole() %>"><%= u.getRole().toUpperCase() %></span></td>
                         <td>
-                            <span class="status-badge <%= "Available".equals(u.getAvailability()) ? "status-online" : "status-offline" %>">
+                            <span class="status-badge <%= "Available".equals(u.getAvailability()) ? "status-online" : "status-offline" %>" style="display:inline-block; margin-bottom:4px;">
                                 <i class="fa <%= "Available".equals(u.getAvailability()) ? "fa-check-circle" : "fa-times-circle" %>"></i>
                                 <%= u.getAvailability() %>
                             </span>
+                            <span class="status-badge <%= "Active".equals(u.getAccountStatus()) ? "status-online" : "status-offline" %>" style="display:inline-block;">
+                                <%= u.getAccountStatus() %>
+                            </span>
                         </td>
                         <td class="text-sm"><%= u.getEmail() %></td>
+                        <td class="text-sm text-muted"><%= u.getLastLogin() %></td>
                         <td class="text-right">
                             <div class="action-group">
-                                <a href="users-management.jsp?editId=<%= u.getId() %>" class="btn-icon" title="Edit Profile"><i class="fa fa-pen-to-square"></i></a>
+                                <a href="users-management.jsp?editId=<%= u.getId() %>" class="btn-icon" title="Edit Profile"><i class="fa fa-pen-to-square" style="color: red;"></i></a>
                                 <form action="user" method="post" onsubmit="return confirm('Archive this user account permanently?');" style="display:inline;">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<%= u.getId() %>">
                                     <input type="hidden" name="redirect" value="users-management.jsp">
-                                    <button type="submit" class="btn-icon btn-delete" title="Remove User"><i class="fa fa-trash-can"></i></button>
+                                    <button type="submit" class="btn-icon btn-delete" title="Remove User"><i class="fa fa-trash-can" style="color: white;"></i></button>
                                 </form>
                             </div>
                         </td>
@@ -264,4 +275,35 @@
 %>
 
 </body>
+<script>
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelectorAll(".ns-table tr");
+        
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+            
+            // Exclude the 'Actions' column (usually the last column)
+            for (var j = 0; j < cols.length - 1; j++) {
+                var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+                data = data.replace(/"/g, '""');
+                row.push('"' + data + '"');
+            }
+            if (row.length > 0) csv.push(row.join(","));
+        }
+
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+    function downloadCSV(csv, filename) {
+        var csvFile = new Blob([csv], {type: "text/csv"});
+        var downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+</script>
 </html>

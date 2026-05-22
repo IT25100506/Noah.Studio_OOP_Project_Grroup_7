@@ -32,15 +32,29 @@
     // 3. ANALYTICS CALCULATIONS (JAVA ONLY)
     double totalRevenue = payments.stream().filter(p -> "Paid".equals(p.getStatus())).mapToDouble(Payment::getAmount).sum();
     double pendingRevenue = payments.stream().filter(p -> "Pending".equals(p.getStatus())).mapToDouble(Payment::getAmount).sum();
+    double refundedRevenue = payments.stream().filter(p -> "Refunded".equals(p.getStatus())).mapToDouble(Payment::getAmount).sum();
     
     Map<String, Long> bookingByStatus = bookings.stream().collect(Collectors.groupingBy(Booking::getStatus, Collectors.counting()));
     long totalBookings = bookings.size();
     long pendingCount = bookings.stream().filter(b -> "Pending".equalsIgnoreCase(b.getStatus())).count();
     long confirmedCount = bookings.stream().filter(b -> "Confirmed".equalsIgnoreCase(b.getStatus())).count();
     
+    // Package Analytics
+    List<ServicePackage> allPkgs = new ArrayList<>();
+    for (String l : FileHandler.readLines("packages.txt")) { 
+        ServicePackage p = ServicePackage.fromFileString(l); 
+        if (p != null) allPkgs.add(p); 
+    }
+    long totalPkgs = allPkgs.size();
+    long photoPkgs = allPkgs.stream().filter(p -> "photography".equalsIgnoreCase(p.getType())).count();
+    long videoPkgs = allPkgs.stream().filter(p -> "videography".equalsIgnoreCase(p.getType())).count();
+    long activePkgs = allPkgs.stream().filter(ServicePackage::isActive).count();
+    long inactivePkgs = totalPkgs - activePkgs;
+    
     // Pre-format strings to avoid complex JSP expressions in HTML
     String displayRevenue = String.format("%,.0f", totalRevenue);
     String displayPendingRevenue = String.format("%,.0f", pendingRevenue);
+    String displayRefundedRevenue = String.format("%,.0f", refundedRevenue);
     String displayAvgValue = totalBookings > 0 ? String.format("%,.0f", totalRevenue / totalBookings) : "0";
     
     double revenueRatio = (totalRevenue + pendingRevenue) > 0 ? (totalRevenue / (totalRevenue + pendingRevenue) * 100) : 0;
@@ -71,7 +85,7 @@
         .stat-card:hover { border-color: var(--accent); transform: translateY(-5px); }
         .stat-card i { position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.05; color: var(--accent); }
         
-        .welcome-hero { background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.1) 0%, rgba(5, 5, 5, 0) 100%); border: 1px solid rgba(var(--accent-rgb), 0.2); padding: 3rem; margin-bottom: 3rem; }
+
         
         .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
         .chart-container { padding: 2.5rem; background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.05); }
@@ -103,37 +117,27 @@
             </div>
         </header>
 
-        <div class="welcome-hero">
-            <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Studio Performance Overview</h2>
-            <p style="color:var(--text-muted); max-width: 600px; font-size: 0.9rem; line-height: 1.8;">
-                Welcome back. The studio currently has <strong style="color:var(--accent)"><%= confirmedCount %></strong> confirmed events and <strong style="color:var(--accent)"><%= pendingCount %></strong> pending requests that require review.
-            </p>
-            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-                <a href="booking-management.jsp" class="btn-primary-sm">Manage Bookings</a>
-                <a href="#" class="btn-secondary" style="font-size:0.7rem; padding: 0.75rem 1.5rem;" onclick="window.print()"><i class="fa fa-file-export"></i> Export Report</a>
-            </div>
-        </div>
 
-        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 4rem;">
+
+        <div style="margin-bottom: 2rem;">
+            <span class="section-tag">Financial Summary</span>
+            <h2 style="font-size: 1.5rem; margin-top: 0.5rem;">Revenue <span style="color:var(--accent)">Overview</span></h2>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 4rem;">
             <div class="card stat-card">
-                <span class="section-tag" style="font-size: 0.6rem;">Total Revenue</span>
-                <div style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;">LKR <%= displayRevenue %></div>
+                <span class="section-tag" style="font-size: 0.6rem;">Total Revenue Collected</span>
+                <div style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem; color: #4caf50;">LKR <%= displayRevenue %></div>
                 <i class="fa fa-wallet"></i>
             </div>
             <div class="card stat-card">
-                <span class="section-tag" style="font-size: 0.6rem;">Active Users</span>
-                <div style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;"><%= users.size() %></div>
-                <i class="fa fa-users"></i>
+                <span class="section-tag" style="font-size: 0.6rem;">Total Pending Payments</span>
+                <div style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem; color: #ff9800;">LKR <%= displayPendingRevenue %></div>
+                <i class="fa fa-hourglass-half"></i>
             </div>
             <div class="card stat-card">
-                <span class="section-tag" style="font-size: 0.6rem;">Confirmed Events</span>
-                <div style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;"><%= confirmedCount %></div>
-                <i class="fa fa-calendar-check"></i>
-            </div>
-            <div class="card stat-card">
-                <span class="section-tag" style="font-size: 0.6rem;">Avg. Value</span>
-                <div style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;">LKR <%= displayAvgValue %></div>
-                <i class="fa fa-chart-line"></i>
+                <span class="section-tag" style="font-size: 0.6rem;">Total Refunds</span>
+                <div style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem; color: var(--danger);">LKR <%= displayRefundedRevenue %></div>
+                <i class="fa fa-hand-holding-dollar"></i>
             </div>
         </div>
 
@@ -154,6 +158,9 @@
                     <div class="bar-bg">
                         <div class="bar-fill" <%= "style=\"width: " + pendingBarWidth + "%; background: #333;\"" %>></div>
                     </div>
+                </div>
+                <div class="bar-row" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                    <div class="bar-label" style="color: var(--danger);"><span>Refunded Amount</span><span>LKR <%= displayRefundedRevenue %></span></div>
                 </div>
             </div>
 

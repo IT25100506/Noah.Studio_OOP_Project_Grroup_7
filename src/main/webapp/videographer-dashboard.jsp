@@ -62,10 +62,10 @@
         <jsp:include page="admin-sidebar.jsp" />
         
         <main class="main-content">
-            <header class="content-header" style="margin-bottom: 4rem;">
-                <span class="section-tag" style="color:var(--accent)">Cinematic Videographer</span>
-                <h1 style="font-size: 3rem;">Director <span style="color:var(--accent)"><%= uName.split(" ")[0] %></span></h1>
-                <p style="color:var(--text-muted)">Your cinematic production hub. Manage shoots and view performance metrics.</p>
+            <header class="content-header" style="margin-bottom: 3rem;">
+                <span class="section-tag">Cinematic Videographer</span>
+                <h1 style="font-size: 2.5rem; margin: 0;">Director <span class="serif" style="color:var(--accent); text-transform:none;"><%= uName.split(" ")[0] %></span></h1>
+                <p style="color:var(--text-muted); margin-top: 0.5rem;">Your cinematic production hub. Manage shoots and view performance metrics.</p>
             </header>
             
             <div class="stat-grid">

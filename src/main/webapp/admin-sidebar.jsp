@@ -20,6 +20,8 @@
         activePage = "payments";
     } else if (currentURI.contains("staff-feedback") || currentURI.contains("review")) {
         activePage = "feedback";
+    } else if (currentURI.contains("contact-management")) {
+        activePage = "inquiries";
     } else if (currentURI.contains("dashboard")) {
         activePage = "dashboard";
     }
@@ -48,6 +50,9 @@
         <li><a href="portfolio-management.jsp" class="<%= activePage.equals("gallery") ? "active" : "" %>"><i class="fa fa-images"></i> Gallery</a></li>
         <li><a href="<%= isAdmin ? "payment?action=list" : "staff-payments.jsp" %>" class="<%= activePage.equals("payments") ? "active" : "" %>"><i class="fa fa-credit-card"></i> Payments</a></li>
         <li><a href="<%= isAdmin ? "review?action=list" : "staff-feedback.jsp" %>" class="<%= activePage.equals("feedback") ? "active" : "" %>"><i class="fa fa-star"></i> Feedback</a></li>
+        <% if (isAdmin) { %>
+        <li><a href="contact-management.jsp" class="<%= activePage.equals("inquiries") ? "active" : "" %>"><i class="fa fa-envelope-open-text"></i> Inquiries</a></li>
+        <% } %>
     </ul>
     <a href="user?action=logout" class="logout-link"><i class="fa fa-sign-out-alt"></i> Logout</a>
 </aside>

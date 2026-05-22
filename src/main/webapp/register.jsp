@@ -39,12 +39,14 @@
                     </div>
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" name="username" class="form-control" required>
+                        <input type="text" id="username" name="username" class="form-control" required>
+                        <span id="username-error" style="color:#e74c3c; font-size: 0.75rem; margin-top: 5px; display: block;"></span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" name="email" class="form-control" required>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                    <span id="email-error" style="color:#e74c3c; font-size: 0.75rem; margin-top: 5px; display: block;"></span>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                     <div class="form-group">
@@ -73,5 +75,41 @@
     </div>
     <div class="side-image"></div>
 </div>
+<script>
+    const checkDuplicate = (type) => {
+        const input = document.getElementById(type);
+        const errorSpan = document.getElementById(type + '-error');
+        const val = input.value.trim();
+        
+        if (val.length < 3) {
+            errorSpan.textContent = '';
+            return;
+        }
+
+        fetch('<%= request.getContextPath() %>/user?action=checkDuplicate&' + type + '=' + encodeURIComponent(val))
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    errorSpan.textContent = data.message;
+                } else {
+                    errorSpan.textContent = '';
+                }
+            })
+            .catch(err => console.error('Error checking duplicate:', err));
+    };
+
+    let typingTimer;
+    const doneTypingInterval = 500;
+
+    document.getElementById('username').addEventListener('keyup', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => checkDuplicate('username'), doneTypingInterval);
+    });
+
+    document.getElementById('email').addEventListener('keyup', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => checkDuplicate('email'), doneTypingInterval);
+    });
+</script>
 </body>
 </html>

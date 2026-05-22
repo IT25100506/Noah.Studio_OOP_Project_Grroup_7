@@ -54,6 +54,9 @@ public class UserServlet extends HttpServlet {
             case "list":
                 handleList(req, res);
                 break;
+            case "checkDuplicate":
+                handleCheckDuplicate(req, res);
+                break;
             default:
                 res.sendRedirect(req.getContextPath() + "/login.jsp");
         }
@@ -158,6 +161,18 @@ public class UserServlet extends HttpServlet {
             if (user != null
                     && user.getUsername().equalsIgnoreCase(username)
                     && user.getPassword().equals(password)) {
+                
+                if ("Suspended".equalsIgnoreCase(user.getAccountStatus())) {
+                    req.setAttribute("error", "Your account has been suspended. Please contact the admin.");
+                    req.getRequestDispatcher("/login.jsp").forward(req, res);
+                    return;
+                }
+
+                // Update last login
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a");
+                user.setLastLogin(sdf.format(new java.util.Date()));
+                FileHandler.updateById(USERS_FILE, user.getId(), user.toFileString());
+
                 // Valid — create session
                 HttpSession session = req.getSession(true);
                 session.setAttribute("user",     user);
@@ -316,6 +331,8 @@ public class UserServlet extends HttpServlet {
                 if (!FileHandler.isNullOrEmpty(password)) user.setPassword(password);
                 if (specialization != null) user.setSpecialization(specialization);
                 if (availability != null)   user.setAvailability(availability);
+                String accountStatus = req.getParameter("accountStatus");
+                if (accountStatus != null) user.setAccountStatus(accountStatus);
                 
                 FileHandler.updateById(USERS_FILE, id, user.toFileString());
             }
@@ -330,5 +347,36 @@ public class UserServlet extends HttpServlet {
         Admin admin = new Admin("USR001", "admin", "admin123",
                                 "admin@noahstudio.com", "0123456789", "System Admin");
         FileHandler.appendLine(USERS_FILE, admin.toFileString());
+    }
+
+    // ── Check Duplicate ───────────────────────────────────────────────────────
+    private void handleCheckDuplicate(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        PrintWriter out = res.getWriter();
+        
+        String username = req.getParameter("username");
+        String email = req.getParameter("email");
+        boolean exists = false;
+        String message = "";
+        
+        for (String line : FileHandler.readLines(USERS_FILE)) {
+            User u = User.fromFileString(line);
+            if (u != null) {
+                if (username != null && u.getUsername().equalsIgnoreCase(username)) {
+                    exists = true;
+                    message = "This username is already taken.";
+                    break;
+                }
+                if (email != null && u.getEmail().equalsIgnoreCase(email)) {
+                    exists = true;
+                    message = "This email is already taken.";
+                    break;
+                }
+            }
+        }
+        
+        out.print("{\"exists\": " + exists + ", \"message\": \"" + message + "\"}");
+        out.flush();
     }
 }

@@ -131,7 +131,19 @@ public class FileHandler {
      */
     public static String generateId(String prefix, String filename) throws IOException {
         List<String> lines = readLines(filename);
-        return prefix + String.format("%03d", lines.size() + 1);
+        int maxId = 0;
+        for (String line : lines) {
+            String lineId = line.split("\\|", 2)[0];
+            if (lineId.startsWith(prefix)) {
+                try {
+                    int num = Integer.parseInt(lineId.substring(prefix.length()));
+                    if (num > maxId) maxId = num;
+                } catch (NumberFormatException e) {
+                    // ignore
+                }
+            }
+        }
+        return prefix + String.format("%03d", maxId + 1);
     }
 
     // ── Validation helpers ────────────────────────────────────────────────────

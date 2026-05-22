@@ -1,10 +1,12 @@
-PRT001|Photo|USR004|Dulansa Ellegedare|Golden Hour Wedding|Romantic garden wedding captured during the golden hour at Cinnamon Grand.|Wedding|2026-01-15|https://images.unsplash.com/photo-1519741497674-611481863552?w=800
-PRT002|Photo|USR004|Dulansa Ellegedare|Corporate Awards Night|Annual corporate gala dinner at Shangri-La Colombo.|Corporate|2026-02-10|https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800
-PRT003|Photo|USR004|Dulansa Ellegedare|Elegant Studio Portrait|High-end professional studio portrait session.|Portrait|2026-03-05|https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800
-PRT004|Photo|USR004|Dulansa Ellegedare|Sunset Beach Ceremony|Breathtaking beach wedding ceremony at Mirissa Bay.|Wedding|2026-03-20|https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800
-PRT005|Photo|USR004|Dulansa Ellegedare|Birthday Celebration|Vibrant 30th birthday celebration with bokeh lighting.|Events|2026-04-01|https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800
-PRT006|Photo|USR004|Dulansa Ellegedare|Fashion Editorial|High-fashion editorial portrait for magazine spread.|Portrait|2026-04-18|https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800
-PRT007|Video|USR003|Imasha Senavirathne|Wedding Cinematic Film|Full cinematic wedding film with drone aerials.|Wedding|2026-02-14|https://www.youtube.com/embed/dQw4w9WgXcQ
-PRT008|Video|USR003|Imasha Senavirathne|Product Launch Event|Corporate product reveal event at Hilton Colombo.|Corporate|2026-03-12|https://www.youtube.com/embed/jNQXAC9IVRw
-PRT009|Photo|USR004|Dulansa Ellegedare|Engagement Photoshoot|Couple engagement session at Galle Fort.|Wedding|2026-04-22|https://images.unsplash.com/photo-1529636798458-92182e662485?w=800
-PRT010|Video|USR003|Imasha Senavirathne|Music Festival Recap|Annual beach music festival highlights reel.|Events|2026-05-01|https://www.youtube.com/embed/kJQP7kiw5Fk
+PRT001|Photo|USR004|Dulansa Ellegedare|Golden Hour Wedding||Wedding|2026-05-19|uploads/portfolio/f2d3e8b6-7bf5-4da0-9c83-779b46cee159_Wedding.jpg|2|false
+PRT002|Photo|USR004|Dulansa Ellegedare|Corporate Awards Night||Corporate|2026-05-19|uploads/portfolio/bc35f953-f3c5-4fe1-9fef-3926b1c79e94_Corporate.jpg|5|true
+PRT003|Photo|USR004|Dulansa Ellegedare|Elegant Studio Fashion||Fashion|2026-05-19|uploads/portfolio/327e96a4-13a4-42cc-88bb-fb9ef5391f8d_Fashion.jpg|16|true
+PRT004|Photo|USR004|Dulansa Ellegedare|Birthday Celebration||Birthday|2026-05-19|uploads/portfolio/6a38d1f8-f7fe-4693-9449-8e9bd519117e_Birthday.jpg|0|false
+PRT005|Photo|USR004|Dulansa Ellegedare|Drone||Drone|2026-05-19|uploads/portfolio/247a53ca-0fe0-47f1-8ce2-1262820df157_Drone.jpg|1|false
+PRT006|Photo|USR004|Dulansa Ellegedare|Fashion Editorial||Fashion|2026-05-19|uploads/portfolio/455dd16b-6862-48a5-927f-7121c484596b_Male Fashion.jpg|2|false
+PRT007|Photo|USR004|Dulansa Ellegedare|Fashion||Fashion|2026-05-19|uploads/portfolio/d7ff2555-96cd-4ff4-af9e-03ffd2fe9b57_Fashion 2.jpg|1|false
+PRT008|Video|USR003|Imasha Senavirathne|Wedding Cinematic Film||Wedding|2026-05-19|https://youtu.be/O7iWM-JCKyc?si=IUsybB8GmVrkjckg|2|false
+PRT009|Video|USR003|Imasha Senavirathne|Shot on Canon||Corporate|2026-05-19|https://youtu.be/Sgxbx65IDeM?si=umHst9ztQy2FkKqm|0|false
+PRT010|Video|USR003|Imasha Senavirathne|Cinematic Birthday||Birthday|2026-05-19|https://youtu.be/E1hWPAGLIp0?si=B3pmdy0FEyj8RDXg|0|false
+PRT011|Video|USR003|Imasha Senavirathne|Fashion||Fashion|2026-05-19|https://youtu.be/z8dnwUHWBug?si=6Sy3uZo7Ddu_EK7R|0|false
+PRT012|Video|USR003|Imasha Senavirathne|Drone||Drone|2026-05-19|https://youtu.be/UIuiYBf__ZU?si=7pH2pPDkBnQtqCk0|0|false
