@@ -113,3 +113,5 @@
 </script>
 </body>
 </html>
+
+<!-- Registration form with client-side validation and server-side processing -->
