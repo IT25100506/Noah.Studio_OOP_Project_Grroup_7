@@ -78,6 +78,8 @@ public class PackageServlet extends HttpServlet {
         } else {
             pkg = new PhotographyPackage(id, name, price, duration, features, description, true);
         }
+        boolean featured = Boolean.parseBoolean(req.getParameter("featured"));
+        pkg.setFeatured(featured);
         
         FileHandler.appendLine(PKG_FILE, pkg.toFileString());
         res.sendRedirect(req.getContextPath() + "/package?action=list");
@@ -95,6 +97,7 @@ public class PackageServlet extends HttpServlet {
                 pkg.setFeatures(req.getParameter("features"));
                 pkg.setDescription(req.getParameter("description"));
                 pkg.setType(req.getParameter("type"));
+                pkg.setFeatured(Boolean.parseBoolean(req.getParameter("featured")));
                 
                 FileHandler.updateById(PKG_FILE, id, pkg.toFileString());
             }
