@@ -380,3 +380,5 @@ public class UserServlet extends HttpServlet {
         out.flush();
     }
 }
+
+// UserServlet handles Login, Logout, and Register actions
