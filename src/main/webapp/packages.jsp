@@ -9,6 +9,30 @@
     
     HttpSession sess = request.getSession(false);
     String role = (sess != null) ? (String) sess.getAttribute("role") : null;
+
+    String search = request.getParameter("search");
+    String sortUrl = request.getParameter("sort");
+    List<ServicePackage> filteredPkgs = new ArrayList<>();
+    for(ServicePackage p : pkgs) {
+        if(search != null && !search.trim().isEmpty()) {
+            if(!p.getName().toLowerCase().contains(search.toLowerCase())) continue;
+        }
+        filteredPkgs.add(p);
+    }
+    
+    if("asc".equals(sortUrl)) {
+        Collections.sort(filteredPkgs, Comparator.comparingDouble(ServicePackage::getPrice));
+    } else if("desc".equals(sortUrl)) {
+        Collections.sort(filteredPkgs, (p1, p2) -> Double.compare(p2.getPrice(), p1.getPrice()));
+    }
+    
+    List<ServicePackage> displayPkgs = new ArrayList<>();
+    for(ServicePackage p : filteredPkgs) {
+        if(p.isFeatured()) displayPkgs.add(p);
+    }
+    for(ServicePackage p : filteredPkgs) {
+        if(!p.isFeatured()) displayPkgs.add(p);
+    }
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,7 +62,7 @@
         <li><a href="index.jsp#testimonials">Review</a></li>
         <li><a href="index.jsp#contact">Contact</a></li>
         <% if (role != null) { %>
-            <li><a href="booking?action=list">My Bookings</a></li>
+            <li><a href="booking?action=list">My Dashboard</a></li>
             <% if ("admin".equals(role)) { %><li><a href="admin-dashboard.jsp">Dashboard</a></li><% } %>
             <% if ("photographer".equals(role)) { %><li><a href="photographer-dashboard.jsp">Dashboard</a></li><% } %>
             <% if ("videographer".equals(role)) { %><li><a href="videographer-dashboard.jsp">Dashboard</a></li><% } %>
@@ -60,15 +84,20 @@
 <section class="container" style="padding-bottom: 10rem;">
     <!-- Filter Bar -->
     <div class="card" style="margin-bottom: 4rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.05);">
-        <form action="package" method="get" style="display:flex; gap: 2rem; align-items: center; justify-content: center;">
+        <form action="package" method="get" style="display:flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
             <input type="hidden" name="action" value="list">
-            <select name="type" class="filter-select" style="min-width: 200px;" onchange="this.form.submit()">
+            <input type="text" name="search" placeholder="Search packages..." class="form-control" style="margin:0; width: 200px;" value="<%= request.getParameter("search") != null ? request.getParameter("search") : "" %>">
+            <select name="type" class="filter-select" style="min-width: 150px;">
                 <option value="">All Services</option>
                 <option value="photography" <%= "photography".equals(request.getParameter("type")) ? "selected" : "" %>>Photography</option>
                 <option value="videography" <%= "videography".equals(request.getParameter("type")) ? "selected" : "" %>>Videography</option>
             </select>
-            <input type="number" name="priceMax" placeholder="Max Price (LKR)" class="form-control" style="margin:0; width: 200px;" value="<%= request.getParameter("priceMax") != null ? request.getParameter("priceMax") : "" %>">
-            <button type="submit" class="btn-primary-sm">Apply Filters</button>
+            <select name="sort" class="filter-select" style="min-width: 150px;">
+                <option value="">Sort by Price</option>
+                <option value="asc" <%= "asc".equals(request.getParameter("sort")) ? "selected" : "" %>>Low to High</option>
+                <option value="desc" <%= "desc".equals(request.getParameter("sort")) ? "selected" : "" %>>High to Low</option>
+            </select>
+            <button type="submit" class="btn-primary-sm">Search</button>
             <% if ("admin".equals(role)) { %>
                 <a href="packages-management.jsp" class="btn-outline-sm" style="margin-left: auto;">Manage Packages</a>
             <% } %>
@@ -76,8 +105,11 @@
     </div>
 
     <div class="packages-grid">
-        <% for (ServicePackage p : pkgs) { %>
-            <div class="package-card <%= p.getName().equalsIgnoreCase("Premium") ? "featured" : "" %>">
+        <% for (ServicePackage p : displayPkgs) { %>
+            <div class="package-card <%= p.isFeatured() ? "featured" : "" %>">
+                <% if(p.isFeatured()) { %>
+                    <div class="recommended-badge"><i class="fas fa-crown"></i> Recommended</div>
+                <% } %>
                 <span class="section-tag" style="font-size: 0.6rem;"><%= p.getType() %> • <%= p.getDuration() %></span>
                 <h3 style="margin: 1rem 0;"><%= p.getName() %></h3>
                 <div class="package-price">LKR <%= String.format("%.0f", p.getPrice()) %></div>
@@ -115,7 +147,7 @@
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
                     <label>Event Date</label>
-                    <input type="date" name="eventDate" class="form-control" required style="background:#0f0f0f; border:1px solid #1a1a1a; color:#fff; width:100%; padding:1rem; border-radius:12px;">
+                    <input type="date" name="eventDate" class="form-control" min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>" required style="background:#0f0f0f; border:1px solid #1a1a1a; color:#fff; width:100%; padding:1rem; border-radius:12px;">
                 </div>
                 <div class="form-group">
                     <label>Event Time</label>
