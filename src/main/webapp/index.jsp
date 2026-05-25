@@ -61,7 +61,7 @@
         <li><a href="#testimonials">Review</a></li>
         <li><a href="#contact">Contact</a></li>
         <% if (loggedRole != null) { %>
-            <li><a href="booking?action=list">My Bookings</a></li>
+            <li><a href="booking?action=list">My Dashboard</a></li>
             <% if ("admin".equals(loggedRole)) { %><li><a href="admin-dashboard.jsp">Dashboard</a></li><% } %>
             <% if ("photographer".equals(loggedRole)) { %><li><a href="photographer-dashboard.jsp">Dashboard</a></li><% } %>
             <% if ("videographer".equals(loggedRole)) { %><li><a href="videographer-dashboard.jsp">Dashboard</a></li><% } %>
@@ -161,7 +161,10 @@
             for (ServicePackage pkg : pkgList) { 
                 if (count++ >= 3) break;
         %>
-        <div class="package-card <%= pkg.getName().equalsIgnoreCase("Premium") ? "featured" : "" %>">
+        <div class="package-card <%= pkg.isFeatured() ? "featured" : "" %>">
+            <% if(pkg.isFeatured()) { %>
+                <div class="recommended-badge"><i class="fas fa-crown"></i> Recommended</div>
+            <% } %>
             <h3><%= pkg.getName() %></h3>
             <div class="package-price">LKR <%= String.format("%.0f", pkg.getPrice()) %></div>
             <p style="color:var(--text-muted); font-size: 0.8rem; margin-bottom: 2rem;"><%= pkg.getDuration() %></p>
@@ -201,12 +204,23 @@
     <div class="section-header">
         <span class="section-tag">Inquiry</span>
         <h2>Contact <span style="color:var(--accent)">Us</span></h2>
+        
+        <% if (request.getParameter("success") != null) { %>
+            <div style="background: rgba(0, 230, 118, 0.1); border: 1px solid var(--success); color: var(--success); padding: 1rem; border-radius: 8px; margin-top: 2rem; font-size: 0.9rem;">
+                <i class="fa fa-check-circle"></i> <%= request.getParameter("success") %>
+            </div>
+        <% } %>
+        <% if (request.getParameter("error") != null) { %>
+            <div style="background: rgba(255, 75, 43, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 1rem; border-radius: 8px; margin-top: 2rem; font-size: 0.9rem;">
+                <i class="fa fa-exclamation-circle"></i> <%= request.getParameter("error") %>
+            </div>
+        <% } %>
     </div>
     <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap: 4rem;">
         <div class="card">
             <div style="margin-bottom: 2rem;">
                 <h5 style="color:var(--accent); margin-bottom: 0.5rem;">ADDRESS</h5>
-                <p style="color:var(--text-muted); font-size: 0.9rem;">123 Studio Lane, Creative District<br>Kuala Lumpur, Malaysia</p>
+                <p style="color:var(--text-muted); font-size: 0.9rem;">123 Studio Lane, Creative District<br>Kandy, Sri Lanka</p>
             </div>
             <div style="margin-bottom: 2rem;">
                 <h5 style="color:var(--accent); margin-bottom: 0.5rem;">PHONE</h5>

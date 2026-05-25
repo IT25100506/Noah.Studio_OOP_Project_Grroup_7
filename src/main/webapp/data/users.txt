@@ -1,4 +1,6 @@
-USR002|ruwindi|ruwindi123|ruvindisenevirathna98@gmail.com|+94 77378 9430|admin|Ruwindi Senavirathne||Available
-USR003|imasha|imasha123|imashasenavirathne17@gmail.com|+94 77853 2300|videographer|Imasha Senavirathne||Available
-USR004|dulansa|dulansa123|dulansaallegedare54@gmail.com|+94 77853 2366|photographer|Dulansa Ellegedare||Available
-USR005|dineth|dineth123|dinethjayasinghe@gmail.com|+94 77378 9999|client|Dineth Jayasinghe||Available
+USR002|ruwindi|ruwindi123|ruvindisenevirathna98@gmail.com|+94 77378 9430|admin|Ruwindi Senavirathne||Available|May 21, 2026 at 08:28 PM|Active
+USR003|imasha|imasha123|imashasenavirathne17@gmail.com|+94 77853 2300|videographer|Imasha Senavirathne||Available|May 20, 2026 at 09:36 PM|Active
+USR004|dulansa|dulansa123|dulansaallegedare54@gmail.com|+94 77853 2366|photographer|Dulansa Ellegedare||Available|May 20, 2026 at 09:39 PM|Active
+USR005|dineth|dineth123|dinethjayasinghe@gmail.com|+94 77378 9999|client|Dineth Jayasinghe||Available|May 20, 2026 at 10:16 PM|Active
+
+# End of user data registry

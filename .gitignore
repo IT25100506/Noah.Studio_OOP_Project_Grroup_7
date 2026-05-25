@@ -39,3 +39,8 @@ logs/
 # =====================
 src/main/webapp/uploads/*
 !src/main/webapp/uploads/.gitkeep
+
+# =====================
+# Nested project folder (do not track)
+# =====================
+Noah. Studio/

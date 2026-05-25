@@ -16,6 +16,8 @@ public abstract class User {
     private String fullName;
     private String specialization = "-"; // Default for non-staff
     private String availability   = "-"; // Default for non-staff
+    private String lastLogin      = "-";
+    private String accountStatus  = "Active";
 
     // ── Constructors ─────────────────────────────────────────────────────────
     public User() {}
@@ -71,6 +73,12 @@ public abstract class User {
     public String getAvailability()           { return availability; }
     public void   setAvailability(String a)   { this.availability = a; }
 
+    public String getLastLogin()              { return lastLogin; }
+    public void   setLastLogin(String l)      { this.lastLogin = l; }
+
+    public String getAccountStatus()          { return accountStatus; }
+    public void   setAccountStatus(String s)  { this.accountStatus = s; }
+
     // ── File serialisation ────────────────────────────────────────────────────
     /**
      * Format: id|username|password|email|phone|role|fullName|specialization|availability
@@ -78,7 +86,7 @@ public abstract class User {
     public String toFileString() {
         return id + "|" + username + "|" + password + "|"
              + email + "|" + phone + "|" + role + "|" + fullName + "|"
-             + specialization + "|" + availability;
+             + specialization + "|" + availability + "|" + lastLogin + "|" + accountStatus;
     }
 
     public static User fromFileString(String line) {
@@ -89,13 +97,19 @@ public abstract class User {
         
         String spec = (p.length > 7) ? p[7] : "-";
         String avail = (p.length > 8) ? p[8] : "-";
+        String lastLogin = (p.length > 9) ? p[9] : "-";
+        String accountStatus = (p.length > 10) ? p[10] : "Active";
 
+        User u;
         switch (role.toLowerCase()) {
-            case "admin":        return new Admin(id, username, password, email, phone, fullName, spec, avail);
-            case "photographer": return new Photographer(id, username, password, email, phone, fullName, spec, avail);
-            case "videographer": return new Videographer(id, username, password, email, phone, fullName, spec, avail);
-            default:             return new Client(id, username, password, email, phone, fullName, spec, avail);
+            case "admin":        u = new Admin(id, username, password, email, phone, fullName, spec, avail); break;
+            case "photographer": u = new Photographer(id, username, password, email, phone, fullName, spec, avail); break;
+            case "videographer": u = new Videographer(id, username, password, email, phone, fullName, spec, avail); break;
+            default:             u = new Client(id, username, password, email, phone, fullName, spec, avail); break;
         }
+        u.setLastLogin(lastLogin);
+        u.setAccountStatus(accountStatus);
+        return u;
     }
 
     @Override
@@ -103,3 +117,5 @@ public abstract class User {
         return "User{id='" + id + "', username='" + username + "', role='" + role + "'}";
     }
 }
+
+// User model supports Role-based Access Control (RBAC)

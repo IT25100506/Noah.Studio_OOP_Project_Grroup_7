@@ -62,10 +62,10 @@
         <jsp:include page="admin-sidebar.jsp" />
         
         <main class="main-content">
-            <header class="content-header" style="margin-bottom: 4rem;">
+            <header class="content-header" style="margin-bottom: 3rem;">
                 <span class="section-tag"><%= role %> dashboard</span>
-                <h1 style="font-size: 3rem;">Welcome Back, <span style="color:var(--accent)"><%= uName.split(" ")[0] %></span></h1>
-                <p style="color:var(--text-muted)">Manage your schedule, uploads, and client feedback from one place.</p>
+                <h1 style="font-size: 2.5rem; margin: 0;">Welcome Back, <span class="serif" style="color:var(--accent); text-transform:none;"><%= uName.split(" ")[0] %></span></h1>
+                <p style="color:var(--text-muted); margin-top: 0.5rem;">Manage your schedule, uploads, and client feedback from one place.</p>
             </header>
             
             <div class="stat-grid">

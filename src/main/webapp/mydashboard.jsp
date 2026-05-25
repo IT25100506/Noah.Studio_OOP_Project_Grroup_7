@@ -35,6 +35,20 @@
     String success = (String) request.getAttribute("success");
     if (success == null) success = request.getParameter("success");
 
+    List<Booking> upcomingBookings = new ArrayList<>();
+    java.util.Date todayDate = new java.util.Date();
+    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+    for (Booking b : bookings) {
+        try {
+            java.util.Date eDate = sdf.parse(b.getEventDate());
+            long diff = eDate.getTime() - todayDate.getTime();
+            long days = java.util.concurrent.TimeUnit.DAYS.convert(diff, java.util.concurrent.TimeUnit.MILLISECONDS);
+            if (days >= 0 && days <= 7 && ("Pending".equals(b.getStatus()) || "Confirmed".equals(b.getStatus()))) {
+                upcomingBookings.add(b);
+            }
+        } catch(Exception e) {}
+    }
+
     // Fetch All Payments for this user
     List<Payment> userPayments = new ArrayList<>();
     for (String pl : FileHandler.readLines("payments.txt")) {
@@ -87,7 +101,8 @@
 
 <div class="page-hero" style="padding-top: 10rem; padding-bottom: 2rem; text-align: center;">
     <span class="section-tag">Management</span>
-    <h1>Your <span style="color:var(--accent)">Dashboard</span></h1>
+    <h1 style="font-size: 2.5rem; margin: 0; display: inline-block;">Your <span class="serif" style="color:var(--accent); text-transform:none;">Dashboard</span></h1>
+    <p style="color:var(--text-muted); margin-top: 0.5rem;">Client Access • <%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(new java.util.Date()) %></p>
 </div>
 
 <div class="container" style="margin-bottom: 3rem;">
@@ -115,6 +130,21 @@
         <% } %>
     </div>
 
+    <% if (!upcomingBookings.isEmpty()) { %>
+    <div style="background: rgba(231,76,60,0.1); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--accent); margin-top: 0; margin-bottom: 1rem;"><i class="fa fa-bell"></i> Upcoming Bookings (Next 7 Days)</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+            <% for (Booking ub : upcomingBookings) { %>
+            <div style="background: #111; padding: 1rem; border-radius: 8px; font-size: 0.85rem;">
+                <div style="font-weight: bold; margin-bottom: 0.3rem;"><%= ub.getEventDate() %> - <%= ub.getEventLocation() %></div>
+                <div style="color: var(--text-muted);"><%= ub.getServicePackageName() %></div>
+                <div style="color: var(--accent); font-size: 0.75rem; margin-top: 0.5rem;"><%= ub.getReferenceNumber() != null ? ub.getReferenceNumber() : ub.getId() %></div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+    <% } %>
+
     <div class="card" style="padding: 0; border: 1px solid rgba(255,255,255,0.05); overflow: hidden;">
         <table class="ns-table">
             <thead>
@@ -130,14 +160,17 @@
             <tbody>
                 <% for (Booking b : bookings) { %>
                 <tr>
-                    <td style="color:var(--accent); font-weight: 800;"><%= b.getId() %></td>
+                    <td style="color:var(--accent); font-weight: 800;"><%= b.getReferenceNumber() != null ? b.getReferenceNumber() : b.getId() %></td>
                     <td><%= b.getServicePackageName() %></td>
                     <td><%= b.getEventDate() %></td>
                     <td><%= b.getEventLocation() %></td>
                     <td>
-                        <span class="role-badge <%= "Confirmed".equals(b.getStatus()) ? "badge-success" : "badge-muted" %>" style="margin:0; font-size: 0.6rem;">
+                        <span class="role-badge <%= "Confirmed".equals(b.getStatus()) ? "badge-success" : ("Cancelled".equals(b.getStatus()) ? "badge-danger" : "badge-muted") %>" style="margin:0; font-size: 0.6rem;">
                             <%= b.getStatus().toUpperCase() %>
                         </span>
+                        <% if ("Cancelled".equals(b.getStatus()) && b.getCancellationReason() != null && !b.getCancellationReason().isEmpty()) { %>
+                            <div style="font-size: 0.65rem; color: var(--danger); margin-top: 0.3rem;" title="Cancellation Reason"><i class="fa fa-exclamation-circle"></i> <%= b.getCancellationReason() %></div>
+                        <% } %>
                     </td>
                     <td style="text-align:right;">
                         <div style="display:flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
@@ -174,11 +207,13 @@
                                         data-type="<%= b.getEventType() != null ? b.getEventType() : "" %>"
                                         data-contact="<%= b.getClientContact() != null ? b.getClientContact().replace("\"", "&quot;") : "" %>"
                                         onclick="initEditBooking(this)">
-                                    <i class="fa fa-edit"></i>
+                                    <i class="fa fa-edit" style="color: red;"></i>
                                 </button>
-                                <a href="booking?action=delete&id=<%= b.getId() %>" class="btn-icon btn-delete" title="Cancel Booking" onclick="return confirm('Cancel this booking?')">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                            <% } %>
+                            <% if ("client".equals(role) && ("Pending".equals(b.getStatus()) || "Confirmed".equals(b.getStatus()))) { %>
+                                <button class="btn-icon btn-delete" title="Cancel Booking" onclick="initCancelBooking('<%= b.getId() %>')">
+                                    <i class="fa fa-times-circle"></i>
+                                </button>
                             <% } %>
                         </div>
                     </td>
@@ -198,6 +233,30 @@
         <span class="section-tag">Financial Summary</span>
         <h2 style="font-size: 2rem; margin-top: 0.5rem;">Payment <span style="color:var(--accent)">History</span></h2>
     </div>
+    
+    <% 
+        List<String[]> activeDiscounts = new ArrayList<>();
+        for (String dl : FileHandler.readLines("discounts.txt")) {
+            String[] dp = dl.split("\\|");
+            if (dp.length >= 2) activeDiscounts.add(dp);
+        }
+        if (!activeDiscounts.isEmpty()) {
+    %>
+    <div style="background: rgba(209,120,95,0.1); border: 1px dashed var(--accent); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h3 style="color: var(--accent); margin: 0 0 0.5rem 0;"><i class="fa fa-tag"></i> Special Offers Available!</h3>
+            <p style="font-size: 0.8rem; margin: 0; color: var(--text-muted);">Apply these codes at checkout to receive a discount on your payment.</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <% for(String[] discount : activeDiscounts) { %>
+                <div style="background: #111; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #333; text-align: center;">
+                    <div style="font-weight: 800; color: #fff; letter-spacing: 1px;"><%= discount[0] %></div>
+                    <div style="font-size: 0.65rem; color: var(--accent);"><%= discount[1] %>% OFF</div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    <% } %>
     
     <div class="card" style="padding: 0; border: 1px solid rgba(255,255,255,0.05); overflow: hidden;">
         <table class="ns-table">
@@ -228,7 +287,18 @@
                 <tr>
                     <td style="color:var(--accent); font-weight: 800;"><%= b.getId() %></td>
                     <td><%= b.getServicePackageName() %></td>
-                    <td><%= String.format("%.0f", pkgPrice) %></td>
+                    <td>
+                        <div style="font-weight: 800; font-size: 0.9rem;">LKR <%= String.format("%.0f", pkgPrice) %></div>
+                        <% if (totalPaid > 0) { 
+                            int progress = (int)((totalPaid / pkgPrice) * 100);
+                            if(progress > 100) progress = 100;
+                        %>
+                        <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.2rem;">LKR <%= String.format("%.0f", totalPaid) %> of LKR <%= String.format("%.0f", pkgPrice) %> paid</div>
+                        <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.3rem; overflow: hidden;">
+                            <div style="width: <%= progress %>%; height: 100%; background: var(--accent);"></div>
+                        </div>
+                        <% } %>
+                    </td>
                     <td>
                         <span class="role-badge <%= isFullyPaid ? "badge-success" : "badge-muted" %>" style="font-size: 0.6rem;">
                             <%= isFullyPaid ? "SETTLED" : "UNPAID" %>
@@ -281,29 +351,33 @@
     
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
         <% for (Review r : userReviews) { %>
-            <div class="card" style="padding: 2rem; border: 1px solid rgba(255,255,255,0.05);">
-                <div style="margin-bottom: 0.8rem;">
-                    <% for(int i=1; i<=5; i++) { %>
-                        <i class="fa<%= i <= r.getRating() ? "s" : "r" %> fa-star" style="color: var(--accent); font-size: 0.7rem;"></i>
-                    <% } %>
+            <div class="card" style="padding: 2rem; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column;">
+                <div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <% for(int i=1; i<=5; i++) { %>
+                            <i class="fa<%= i <= r.getRating() ? "s" : "r" %> fa-star" style="color: var(--accent); font-size: 0.7rem;"></i>
+                        <% } %>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #ccc; font-style: italic; margin-bottom: 1.5rem;">"<%= r.getComment() %>"</p>
                 </div>
-                <p style="font-size: 0.85rem; color: #ccc; font-style: italic; margin-bottom: 1.5rem;">"<%= r.getComment() %>"</p>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <span style="font-size: 0.65rem; color: var(--text-muted);"><%= r.getDate() %></span>
-                    <%= r.renderBadgeHTML() %>
-                </div>
-                <div style="display: flex; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
-                    <button class="btn-icon" title="Edit Review" 
-                            data-id="<%= r.getId() %>"
-                            data-rating="<%= r.getRating() %>"
-                            data-staff="<%= r.getStaffId() %>"
-                            data-comment="<%= r.getComment().replace("\"", "&quot;") %>"
-                            onclick="initEditReview(this)">
-                        <i class="fa fa-edit"></i>
-                    </button>
-                    <a href="review?action=delete&id=<%= r.getId() %>&source=dashboard" class="btn-icon btn-delete" title="Delete Review" onclick="return confirm('Delete this review?')">
-                        <i class="fa fa-trash"></i>
-                    </a>
+                <div style="margin-top: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <span style="font-size: 0.65rem; color: var(--text-muted);"><%= r.getDate() %></span>
+                        <%= r.renderBadgeHTML() %>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <button class="btn-icon" title="Edit Review" 
+                                data-id="<%= r.getId() %>"
+                                data-rating="<%= r.getRating() %>"
+                                data-staff="<%= r.getStaffId() %>"
+                                data-comment="<%= r.getComment().replace("\"", "&quot;") %>"
+                                onclick="initEditReview(this)">
+                            <i class="fa fa-edit" style="color: red;"></i>
+                        </button>
+                        <a href="review?action=delete&id=<%= r.getId() %>&source=dashboard" class="btn-icon btn-delete" title="Delete Review" onclick="return confirm('Delete this review?')">
+                            <i class="fa fa-trash" style="color: white;"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         <% } %>
@@ -344,7 +418,7 @@
                 </div>
                 <div class="form-group">
                     <label>Event Date</label>
-                    <input type="date" name="eventDate" class="form-control" required>
+                    <input type="date" name="eventDate" class="form-control" min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>" required>
                 </div>
                 <div class="form-group">
                     <label>Event Time</label>
@@ -426,6 +500,31 @@
     </div>
 </div>
 
+<!-- Cancel Booking Modal -->
+<div id="cancelBookingModal" class="modal-overlay" style="display:none;">
+    <div class="modal-container" style="max-width: 500px;">
+        <button class="modal-close-btn" onclick="closeCancelModal()">&times;</button>
+        <span class="section-tag" style="color:var(--danger)">Cancellation</span>
+        <h2 style="margin-bottom: 2rem;">Cancel <span style="color:var(--danger)">Booking</span></h2>
+        
+        <form action="booking" method="post">
+            <input type="hidden" name="action" value="cancel">
+            <input type="hidden" name="id" id="cancel-bkg-id">
+            
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label>Reason for Cancellation</label>
+                <textarea name="cancellationReason" class="form-control" rows="3" placeholder="Please let us know why you are cancelling..." required></textarea>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(211,47,47,0.1); border-radius: 8px; border: 1px solid var(--danger);">
+                <p style="font-size: 0.75rem; color: var(--danger); margin: 0;">Are you sure you want to cancel this booking? This action cannot be undone.</p>
+            </div>
+
+            <button type="submit" class="btn-primary" style="background: var(--danger); width: 100%; padding: 1.25rem;">Confirm Cancellation</button>
+        </form>
+    </div>
+</div>
+
 <style>
     .modal-overlay { 
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -488,6 +587,11 @@
             <div id="balance-group" class="form-group" style="display:none; margin-bottom: 1rem;">
                 <label style="margin-bottom: 0.3rem;">Remaining Balance (LKR)</label>
                 <input type="number" name="balanceDue" class="form-control" placeholder="Outstanding amount" style="padding: 0.8rem !important;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="margin-bottom: 0.3rem;">Promo Code (Optional)</label>
+                <input type="text" name="promoCode" class="form-control" placeholder="Enter discount code" style="padding: 0.8rem !important; text-transform: uppercase;">
             </div>
             
             <div class="form-group" style="margin-bottom: 1rem;">
@@ -670,6 +774,13 @@
     }
     
     function closeEditModal() { document.getElementById('editBookingModal').style.display = 'none'; }
+
+    function initCancelBooking(id) {
+        document.getElementById('cancel-bkg-id').value = id;
+        document.getElementById('cancelBookingModal').style.display = 'flex';
+    }
+
+    function closeCancelModal() { document.getElementById('cancelBookingModal').style.display = 'none'; }
 
     function initPayment(bId, pName, pPrice) {
         document.getElementById('pay-bookingId').value = bId;

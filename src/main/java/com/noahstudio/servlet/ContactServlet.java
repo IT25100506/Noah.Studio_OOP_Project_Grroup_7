@@ -32,8 +32,7 @@ public class ContactServlet extends HttpServlet {
 
         if (FileHandler.isNullOrEmpty(name) || !FileHandler.isValidEmail(email)
                 || FileHandler.isNullOrEmpty(message)) {
-            req.setAttribute("error", "Please fill all fields with valid data.");
-            req.getRequestDispatcher("/contact.jsp").forward(req, res);
+            res.sendRedirect("index.jsp?error=Please fill all fields with valid data#contact");
             return;
         }
 
@@ -41,13 +40,12 @@ public class ContactServlet extends HttpServlet {
         String record = LocalDate.now() + "|" + name + "|" + email + "|" + message;
         FileHandler.appendLine(CONTACT_FILE, record);
 
-        req.setAttribute("success", "Message sent! We'll get back to you within 24 hours.");
-        req.getRequestDispatcher("/contact.jsp").forward(req, res);
+        res.sendRedirect("index.jsp?success=Message sent! We will contact you soon#contact");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        req.getRequestDispatcher("/contact.jsp").forward(req, res);
+        res.sendRedirect("index.jsp#contact");
     }
 }
