@@ -307,3 +307,5 @@
     }
 </script>
 </html>
+
+<!-- Admin dashboard for managing user accounts and roles -->
