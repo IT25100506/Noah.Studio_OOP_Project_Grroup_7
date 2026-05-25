@@ -117,3 +117,5 @@ public abstract class User {
         return "User{id='" + id + "', username='" + username + "', role='" + role + "'}";
     }
 }
+
+// User model supports Role-based Access Control (RBAC)
