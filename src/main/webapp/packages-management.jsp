@@ -100,13 +100,13 @@
     <jsp:include page="admin-sidebar.jsp" />
 
     <main class="main-content">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+        <header class="content-header" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
             <div>
-                <span class="section-tag">catalog management</span>
-                <h1 style="font-size: 2rem; margin-top: 0.5rem;">Service <span style="color:var(--accent)">Packages</span></h1>
+                <span class="section-tag">Catalog Management</span>
+                <h1 style="font-size: 2.5rem; margin: 0;">Service <span class="serif" style="color:var(--accent); text-transform:none;">Packages</span></h1>
             </div>
             <button class="btn-primary-sm" onclick="openModal('addPkgModal')">+ New Package</button>
-        </div>
+        </header>
 
         <!-- Filter Controls -->
         <div class="card" style="padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #1a1a1a;">
@@ -145,10 +145,11 @@
                                 data-features="<%= p.getFeatures().replace("\"", "&quot;") %>"
                                 data-desc="<%= p.getDescription().replace("\"", "&quot;").replace("\n", " ").replace("\r", " ") %>"
                                 data-type="<%= p.getType() %>"
+                                data-featured="<%= p.isFeatured() %>"
                                 onclick="initEdit(this)">
-                            <i class="fa fa-edit"></i>
+                            <i class="fa fa-edit" style="color: red;"></i>
                         </button>
-                        <a href="package?action=delete&id=<%= p.getId() %>" class="btn-icon btn-delete" onclick="return confirm('Delete this package?')"><i class="fa fa-trash"></i></a>
+                        <a href="package?action=delete&id=<%= p.getId() %>" class="btn-icon btn-delete" onclick="return confirm('Delete this package?')"><i class="fa fa-trash" style="color: white;"></i></a>
                     </div>
                 </div>
             <% } %>
@@ -169,6 +170,12 @@
                     <select name="type" class="form-control" required>
                         <option value="photography">Photography</option>
                         <option value="videography">Videography</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Featured</label>
+                    <select name="featured" class="form-control" required>
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
                     </select>
                 </div>
                 <div class="form-group"><label>Price (LKR)</label><input type="number" name="price" class="form-control" required></div>
@@ -196,6 +203,12 @@
                         <option value="videography">Videography</option>
                     </select>
                 </div>
+                <div class="form-group"><label>Featured</label>
+                    <select name="featured" id="edit-featured" class="form-control" required>
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Price (LKR)</label><input type="number" name="price" id="edit-price" class="form-control" required></div>
                 <div class="form-group"><label>Duration</label><input type="text" name="duration" id="edit-duration" class="form-control" required></div>
             </div>
@@ -218,6 +231,7 @@
         document.getElementById('edit-features').value = btn.getAttribute('data-features');
         document.getElementById('edit-desc').value = btn.getAttribute('data-desc');
         document.getElementById('edit-type').value = btn.getAttribute('data-type');
+        document.getElementById('edit-featured').value = btn.getAttribute('data-featured');
         openModal('editPkgModal');
     }
 </script>
