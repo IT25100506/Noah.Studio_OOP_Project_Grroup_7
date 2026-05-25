@@ -14,6 +14,7 @@ public abstract class ServicePackage {
     private String description;
     private boolean active;
     private String type; // photography | videography
+    private boolean featured;
 
     // ── Constructors ──────────────────────────────────────────────────────────
     public ServicePackage() {}
@@ -60,12 +61,15 @@ public abstract class ServicePackage {
     public String getType()                { return type; }
     public void   setType(String v)        { this.type = v; }
 
+    public boolean isFeatured()            { return featured; }
+    public void    setFeatured(boolean v)  { this.featured = v; }
+
     // ── File serialisation ────────────────────────────────────────────────────
-    /** Format: id|name|price|duration|features|description|active|type */
+    /** Format: id|name|price|duration|features|description|active|type|featured */
     public String toFileString() {
         return id + "|" + name + "|" + price + "|"
              + duration + "|" + features.replace("|","~") + "|"
-             + description.replace("|","~") + "|" + active + "|" + type;
+             + description.replace("|","~") + "|" + active + "|" + type + "|" + featured;
     }
 
     public static ServicePackage fromFileString(String line) {
@@ -78,11 +82,15 @@ public abstract class ServicePackage {
                activeStr = p[6], type = (p.length > 7) ? p[7] : "photography";
         
         boolean active = Boolean.parseBoolean(activeStr);
+        boolean featured = (p.length > 8) ? Boolean.parseBoolean(p[8]) : false;
 
+        ServicePackage pkg;
         if ("videography".equalsIgnoreCase(type)) {
-            return new VideographyPackage(id, name, prc, dur, feat, desc, active);
+            pkg = new VideographyPackage(id, name, prc, dur, feat, desc, active);
         } else {
-            return new PhotographyPackage(id, name, prc, dur, feat, desc, active);
+            pkg = new PhotographyPackage(id, name, prc, dur, feat, desc, active);
         }
+        pkg.setFeatured(featured);
+        return pkg;
     }
 }
